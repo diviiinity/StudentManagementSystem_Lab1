@@ -80,13 +80,46 @@ def delete_student():
     print("Student deleted successfully!")
 
 
+def update_student():
+    email = input("Enter Email of student to update: ").strip()
+    students = load_students()
+
+    for student in students:
+        if student.email == email:
+            print("Leave blank to keep current value.")
+
+            new_first = input(f"First Name ({student.first_name}): ")
+            new_last = input(f"Last Name ({student.last_name}): ")
+            new_course = input(f"Course ID ({student.course_id}): ")
+            new_grade = input(f"Grade ({student.grade}): ")
+            new_marks = input(f"Marks ({student.marks}): ")
+
+            if new_first:
+                student.first_name = new_first
+            if new_last:
+                student.last_name = new_last
+            if new_course:
+                student.course_id = new_course
+            if new_grade:
+                student.grade = new_grade
+            if new_marks:
+                student.marks = int(new_marks)
+
+            save_students(students)
+            print("Student updated successfully!")
+            return
+
+    print("No student found with that email.")
+
+
 def main():
     while True:
         print("\n--- Student Management ---")
         print("1. Add Student")
         print("2. Display Students")
         print("3. Delete Student")
-        print("4. Exit")
+        print("4. Update Student")
+        print("5. Exit")
 
         choice = input("Enter choice: ")
 
@@ -97,7 +130,9 @@ def main():
         elif choice == "3":
             delete_student()
         elif choice == "4":
-            break
+            update_student()
+        elif choice == "5":
+            break  
         else:
             print("Invalid choice.")
 
