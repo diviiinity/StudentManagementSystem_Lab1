@@ -63,12 +63,30 @@ def display_students():
         print(student)
 
 
+def delete_student():
+    email = input("Enter Email of student to delete: ").strip()
+
+    students = load_students()
+    original_count = len(students)
+
+    # keep only students whose email doesn't match
+    students = [s for s in students if s.email != email]
+
+    if len(students) == original_count:
+        print("No student found with that email.")
+        return
+
+    save_students(students)
+    print("Student deleted successfully!")
+
+
 def main():
     while True:
         print("\n--- Student Management ---")
         print("1. Add Student")
         print("2. Display Students")
-        print("3. Exit")
+        print("3. Delete Student")
+        print("4. Exit")
 
         choice = input("Enter choice: ")
 
@@ -77,6 +95,8 @@ def main():
         elif choice == "2":
             display_students()
         elif choice == "3":
+            delete_student()
+        elif choice == "4":
             break
         else:
             print("Invalid choice.")
