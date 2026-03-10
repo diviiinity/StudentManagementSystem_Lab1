@@ -112,6 +112,35 @@ def update_student():
     print("No student found with that email.")
 
 
+import time
+
+def search_student():
+    email = input("Enter Email to search: ").strip()
+
+    students = load_students()
+
+    start_time = time.perf_counter()
+
+    found_student = None
+    for student in students:
+        if student.email == email:
+            found_student = student
+            break
+
+    end_time = time.perf_counter()
+
+    elapsed_time = end_time - start_time
+
+    if found_student:
+        print("Student Found:")
+        print(found_student)
+    else:
+        print("Student not found.")
+
+    print(f"Search Time: {elapsed_time:.6f} seconds")
+
+
+
 def main():
     while True:
         print("\n--- Student Management ---")
@@ -119,7 +148,8 @@ def main():
         print("2. Display Students")
         print("3. Delete Student")
         print("4. Update Student")
-        print("5. Exit")
+        print("5. Search Student")
+        print("6. Exit")
 
         choice = input("Enter choice: ")
 
@@ -132,7 +162,9 @@ def main():
         elif choice == "4":
             update_student()
         elif choice == "5":
-            break  
+            search_student()
+        elif choice == "6":
+            break
         else:
             print("Invalid choice.")
 
