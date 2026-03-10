@@ -140,6 +140,45 @@ def search_student():
     print(f"Search Time: {elapsed_time:.6f} seconds")
 
 
+def sort_students():
+    students = load_students()
+
+    if not students:
+        print("No students to sort.")
+        return
+
+    print("\nSort By:")
+    print("1. Marks Ascending")
+    print("2. Marks Descending")
+    print("3. Email Ascending")
+    print("4. Email Descending")
+
+    choice = input("Enter choice: ")
+
+    import time
+    start_time = time.perf_counter()
+
+    if choice == "1":
+        students.sort(key=lambda s: s.marks)
+    elif choice == "2":
+        students.sort(key=lambda s: s.marks, reverse=True)
+    elif choice == "3":
+        students.sort(key=lambda s: s.email)
+    elif choice == "4":
+        students.sort(key=lambda s: s.email, reverse=True)
+    else:
+        print("Invalid choice.")
+        return
+
+    end_time = time.perf_counter()
+    elapsed_time = end_time - start_time
+
+    print("\nSorted Students:")
+    for student in students:
+        print(student)
+
+    print(f"\nSorting Time: {elapsed_time:.6f} seconds")
+
 
 def main():
     while True:
@@ -149,7 +188,8 @@ def main():
         print("3. Delete Student")
         print("4. Update Student")
         print("5. Search Student")
-        print("6. Exit")
+        print("6. Sort Students")
+        print("7. Exit")
 
         choice = input("Enter choice: ")
 
@@ -164,6 +204,8 @@ def main():
         elif choice == "5":
             search_student()
         elif choice == "6":
+            sort_students()
+        elif choice == "7":
             break
         else:
             print("Invalid choice.")
