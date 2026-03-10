@@ -180,6 +180,30 @@ def sort_students():
     print(f"\nSorting Time: {elapsed_time:.6f} seconds")
 
 
+def course_statistics():
+    import statistics
+
+    course_id = input("Enter Course ID: ").strip()
+    students = load_students()
+
+    course_students = [s for s in students if s.course_id == course_id]
+
+    if not course_students:
+        print("No students found for this course.")
+        return
+
+    marks_list = [s.marks for s in course_students]
+
+    average = sum(marks_list) / len(marks_list)
+    median = statistics.median(marks_list)
+
+    print(f"\nCourse ID: {course_id}")
+    print(f"Number of Students: {len(course_students)}")
+    print(f"Average Marks: {average:.2f}")
+    print(f"Median Marks: {median:.2f}")
+
+
+
 def main():
     while True:
         print("\n--- Student Management ---")
@@ -189,7 +213,8 @@ def main():
         print("4. Update Student")
         print("5. Search Student")
         print("6. Sort Students")
-        print("7. Exit")
+        print("7. Course Statistics")
+        print("8. Exit")
 
         choice = input("Enter choice: ")
 
@@ -206,6 +231,8 @@ def main():
         elif choice == "6":
             sort_students()
         elif choice == "7":
+            course_statistics()
+        elif choice == "8":
             break
         else:
             print("Invalid choice.")
@@ -214,4 +241,3 @@ def main():
 if __name__ == "__main__":
     main()
 
-    
