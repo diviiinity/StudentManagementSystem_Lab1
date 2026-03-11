@@ -203,6 +203,26 @@ def course_statistics():
     print(f"Median Marks: {median:.2f}")
 
 
+def course_report():
+    course_id = input("Enter Course ID for report: ").strip()
+    students = load_students()
+
+    course_students = [s for s in students if s.course_id == course_id]
+
+    if not course_students:
+        print("No students found for this course.")
+        return
+
+    print("\n--- Course Grade Report ---")
+    print(f"Course ID: {course_id}")
+    print("-" * 50)
+
+    for student in course_students:
+        print(f"{student.first_name} {student.last_name} "
+              f"| Email: {student.email} "
+              f"| Marks: {student.marks} "
+              f"| Grade: {student.grade}")
+        
 
 def main():
     while True:
@@ -214,7 +234,8 @@ def main():
         print("5. Search Student")
         print("6. Sort Students")
         print("7. Course Statistics")
-        print("8. Exit")
+        print("8. Course Grade Report")
+        print("9. Exit")
 
         choice = input("Enter choice: ")
 
@@ -233,6 +254,8 @@ def main():
         elif choice == "7":
             course_statistics()
         elif choice == "8":
+            course_report()
+        elif choice == "9":
             break
         else:
             print("Invalid choice.")
@@ -240,4 +263,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
