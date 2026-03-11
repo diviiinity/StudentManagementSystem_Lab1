@@ -2,12 +2,15 @@ from services.csv_handler import CSVHandler
 from models.student import Student
 from models.course import Course
 from models.professor import Professor
+from encdyc import TextSecurity
 
 
 
 STUDENT_FILE = "data/students.csv"
 COURSE_FILE = "data/courses.csv"
 PROFESSOR_FILE = "data/professors.csv"
+LOGIN_FILE = "data/login.csv"
+SHIFT_VALUE = 4
 
 # Load students into a list (array structure)
 def load_students():
@@ -447,6 +450,120 @@ def professor_report():
     print("Professor not found.")
 
 
+#Login
+def load_users():
+    return CSVHandler.load_data(LOGIN_FILE)
+
+
+def save_users(users):
+    fieldnames = ["User_id", "Password", "Role"]
+    CSVHandler.save_data(LOGIN_FILE, users, fieldnames)
+
+
+# Register
+
+def register_user():
+    user_id = input("Enter Email (User ID): ").strip()
+    password = input("Enter Password: ").strip()
+    role = input("Enter Role (admin/student/professor): ").strip()
+
+    users = load_users()
+
+    for u in users:
+        if u["User_id"] == user_id:
+            print("User already exists!")
+            return
+
+    cipher = TextSecurity(SHIFT_VALUE)
+    encrypted_password = cipher.encrypt(password)
+
+    users.append({
+        "User_id": user_id,
+        "Password": encrypted_password,
+        "Role": role
+    })
+
+    save_users(users)
+    print("User registered successfully!")
+
+
+# Login User
+
+def login_user():
+    user_id = input("Enter Email: ").strip()
+    password = input("Enter Password: ").strip()
+
+    users = load_users()
+    cipher = TextSecurity(SHIFT_VALUE)
+
+    for u in users:
+        if u["User_id"] == user_id:
+            decrypted_password = cipher.decrypt(u["Password"])
+
+            if decrypted_password == password:
+                print("Login successful!")
+                return u["Role"]
+
+            else:
+                print("Incorrect password.")
+                return None
+
+    print("User not found.")
+    return None
+
+#Password Change
+
+def change_password():
+    user_id = input("Enter Email: ").strip()
+    old_password = input("Enter Current Password: ").strip()
+
+    users = load_users()
+    cipher = TextSecurity(SHIFT_VALUE)
+
+    for u in users:
+        if u["User_id"] == user_id:
+            decrypted_password = cipher.decrypt(u["Password"])
+
+            if decrypted_password != old_password:
+                print("Incorrect current password.")
+                return
+
+            new_password = input("Enter New Password: ").strip()
+            u["Password"] = cipher.encrypt(new_password)
+
+            save_users(users)
+            print("Password updated successfully!")
+            return
+
+    print("User not found.")
+
+
+
+#Submenu for Login
+
+def login_menu():
+    while True:
+        print("\n--- Login System ---")
+        print("1. Register")
+        print("2. Login")
+        print("3. Change Password")
+        print("4. Back")
+
+        choice = input("Enter choice: ").strip()
+
+        if choice == "1":
+            register_user()
+        elif choice == "2":
+            role = login_user()
+            if role:
+                print(f"Logged in as {role}")
+        elif choice == "3":
+            change_password()
+        elif choice == "4":
+            break
+        else:
+            print("Invalid choice.")
+
 #Submenu for professor
 
 def professor_menu():
@@ -519,7 +636,8 @@ def main():
         print("8. Course Grade Report")
         print("9. Course Management")
         print("10. Professor Management")
-        print("11. Exit")
+        print("11. Login System")
+        print("12. Exit")
         
 
         choice = input("Enter choice: ")
@@ -545,6 +663,8 @@ def main():
         elif choice == "10":
             professor_menu()
         elif choice == "11":
+            login_menu()
+        elif choice == "12":
             break
         else:
             print("Invalid choice.")

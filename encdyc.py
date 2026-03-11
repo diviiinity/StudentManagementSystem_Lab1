@@ -5,15 +5,18 @@ class TextSecurity:
         self.shifter=shift
         self.s=self.shifter%26
   
-    def _convert(self, text,s):
-        """return encrypted string."""
-        result=""
-        for i,ch in enumerate(text):     
-             if (ch.isupper()):
-                  result += chr((ord(ch) + s-65) % 26 + 65)
-             else:
-                  result += chr((ord(ch) + s-97) % 26 + 97)
-        return  result
+    def _convert(self, text, s):
+        result = ""
+
+        for ch in text:
+            if ch.isupper():
+                result += chr((ord(ch) + s - 65) % 26 + 65)
+            elif ch.islower():
+                result += chr((ord(ch) + s - 97) % 26 + 97)
+            else:
+            # Leave numbers and symbols unchanged
+                result += ch
+        return result
   
     def encrypt(self, text):
         """return encrypted string."""
