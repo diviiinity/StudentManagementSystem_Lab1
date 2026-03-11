@@ -1,7 +1,9 @@
 from services.csv_handler import CSVHandler
 from models.student import Student
+from models.course import Course
 
 STUDENT_FILE = "data/students.csv"
+COURSE_FILE = "data/courses.csv"
 
 # Load students into a list (array structure)
 def load_students():
@@ -224,6 +226,128 @@ def course_report():
               f"| Grade: {student.grade}")
         
 
+# Course.py
+
+def load_courses():
+    course_dicts = CSVHandler.load_data(COURSE_FILE)
+    courses = []
+
+    for c in course_dicts:
+        courses.append(
+            Course(
+                c["Course_id"],
+                c["Course_name"],
+                c["Description"]
+            )
+        )
+
+    return courses
+
+
+def save_courses(courses):
+    data = [course.to_dict() for course in courses]
+    fieldnames = ["Course_id", "Course_name", "Description"]
+    CSVHandler.save_data(COURSE_FILE, data, fieldnames)
+
+
+
+#course CRUD Functions:
+
+def add_course():
+    course_id = input("Enter Course ID: ").strip()
+    name = input("Enter Course Name: ").strip()
+    description = input("Enter Description: ").strip()
+
+    courses = load_courses()
+
+    for c in courses:
+        if c.course_id == course_id:
+            print("Course with this ID already exists!")
+            return
+
+    courses.append(Course(course_id, name, description))
+    save_courses(courses)
+    print("Course added successfully!")
+
+
+def display_courses():
+    courses = load_courses()
+
+    if not courses:
+        print("No courses found.")
+        return
+
+    print("\n--- Courses ---")
+    for c in courses:
+        print(c)
+
+
+def delete_course():
+    course_id = input("Enter Course ID to delete: ").strip()
+    courses = load_courses()
+    original_count = len(courses)
+
+    courses = [c for c in courses if c.course_id != course_id]
+
+    if len(courses) == original_count:
+        print("No course found with that ID.")
+        return
+
+    save_courses(courses)
+    print("Course deleted successfully!")
+
+
+def update_course():
+    course_id = input("Enter Course ID to update: ").strip()
+    courses = load_courses()
+
+    for c in courses:
+        if c.course_id == course_id:
+            print("Leave blank to keep current value.")
+
+            new_name = input(f"Course Name ({c.course_name}): ").strip()
+            new_desc = input(f"Description ({c.description}): ").strip()
+
+            if new_name:
+                c.course_name = new_name
+            if new_desc:
+                c.description = new_desc
+
+            save_courses(courses)
+            print("Course updated successfully!")
+            return
+
+    print("No course found with that ID.")
+
+
+
+#Submenu for course
+
+def course_menu():
+    while True:
+        print("\n--- Course Management ---")
+        print("1. Add Course")
+        print("2. Display Courses")
+        print("3. Delete Course")
+        print("4. Update Course")
+        print("5. Back")
+
+        choice = input("Enter choice: ").strip()
+
+        if choice == "1":
+            add_course()
+        elif choice == "2":
+            display_courses()
+        elif choice == "3":
+            delete_course()
+        elif choice == "4":
+            update_course()
+        elif choice == "5":
+            break
+        else:
+            print("Invalid choice.")
+
+
 def main():
     while True:
         print("\n--- Student Management ---")
@@ -235,7 +359,9 @@ def main():
         print("6. Sort Students")
         print("7. Course Statistics")
         print("8. Course Grade Report")
-        print("9. Exit")
+        print("9. Course Management")
+        print("10. Exit")
+        
 
         choice = input("Enter choice: ")
 
@@ -256,6 +382,8 @@ def main():
         elif choice == "8":
             course_report()
         elif choice == "9":
+            course_menu()
+        elif choice == "10":
             break
         else:
             print("Invalid choice.")
@@ -263,5 +391,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
