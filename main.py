@@ -1,9 +1,13 @@
 from services.csv_handler import CSVHandler
 from models.student import Student
 from models.course import Course
+from models.professor import Professor
+
+
 
 STUDENT_FILE = "data/students.csv"
 COURSE_FILE = "data/courses.csv"
+PROFESSOR_FILE = "data/professors.csv"
 
 # Load students into a list (array structure)
 def load_students():
@@ -226,7 +230,7 @@ def course_report():
               f"| Grade: {student.grade}")
         
 
-# Course.py
+# Course
 
 def load_courses():
     course_dicts = CSVHandler.load_data(COURSE_FILE)
@@ -319,6 +323,159 @@ def update_course():
 
     print("No course found with that ID.")
 
+# Professor
+
+def load_professors():
+    professor_dicts = CSVHandler.load_data(PROFESSOR_FILE)
+    professors = []
+
+    for p in professor_dicts:
+        professors.append(
+            Professor(
+                p["Professor_id"],
+                p["Professor_name"],
+                p["Rank"],
+                p["Course_id"]
+            )
+        )
+
+    return professors
+
+
+def save_professors(professors):
+    data = [p.to_dict() for p in professors]
+    fieldnames = ["Professor_id", "Professor_name", "Rank", "Course_id"]
+    CSVHandler.save_data(PROFESSOR_FILE, data, fieldnames)
+
+# Professor CRUD Functions
+
+def add_professor():
+    prof_id = input("Enter Professor ID: ").strip()
+    name = input("Enter Professor Name: ").strip()
+    rank = input("Enter Rank: ").strip()
+    course_id = input("Enter Course ID: ").strip()
+
+    professors = load_professors()
+
+    for p in professors:
+        if p.professor_id == prof_id:
+            print("Professor with this ID already exists!")
+            return
+
+    professors.append(Professor(prof_id, name, rank, course_id))
+    save_professors(professors)
+    print("Professor added successfully!")
+
+
+def display_professors():
+    professors = load_professors()
+
+    if not professors:
+        print("No professors found.")
+        return
+
+    print("\n--- Professors ---")
+    for p in professors:
+        print(p)
+
+
+def delete_professor():
+    prof_id = input("Enter Professor ID to delete: ").strip()
+    professors = load_professors()
+    original_count = len(professors)
+
+    professors = [p for p in professors if p.professor_id != prof_id]
+
+    if len(professors) == original_count:
+        print("No professor found with that ID.")
+        return
+
+    save_professors(professors)
+    print("Professor deleted successfully!")
+
+
+def update_professor():
+    prof_id = input("Enter Professor ID to update: ").strip()
+    professors = load_professors()
+
+    for p in professors:
+        if p.professor_id == prof_id:
+            print("Leave blank to keep current value.")
+
+            new_name = input(f"Name ({p.professor_name}): ").strip()
+            new_rank = input(f"Rank ({p.rank}): ").strip()
+            new_course = input(f"Course ID ({p.course_id}): ").strip()
+
+            if new_name:
+                p.professor_name = new_name
+            if new_rank:
+                p.rank = new_rank
+            if new_course:
+                p.course_id = new_course
+
+            save_professors(professors)
+            print("Professor updated successfully!")
+            return
+
+    print("No professor found with that ID.")
+
+def professor_report():
+    prof_id = input("Enter Professor ID: ").strip()
+
+    professors = load_professors()
+    students = load_students()
+
+    for p in professors:
+        if p.professor_id == prof_id:
+            print("\n--- Professor Report ---")
+            print(p)
+            print("\nStudents in their course:")
+            print("-" * 50)
+
+            course_students = [s for s in students if s.course_id == p.course_id]
+
+            if not course_students:
+                print("No students found for this professor's course.")
+                return
+
+            for s in course_students:
+                print(f"{s.first_name} {s.last_name} "
+                      f"| Marks: {s.marks} "
+                      f"| Grade: {s.grade}")
+            return
+
+    print("Professor not found.")
+
+
+#Submenu for professor
+
+def professor_menu():
+    while True:
+        print("\n--- Professor Management ---")
+        print("1. Add Professor")
+        print("2. Display Professors")
+        print("3. Delete Professor")
+        print("4. Update Professor")
+        print("5. Professor Report")
+        print("6. Back")
+
+        choice = input("Enter choice: ").strip()
+
+        if choice == "1":
+            add_professor()
+        elif choice == "2":
+            display_professors()
+        elif choice == "3":
+            delete_professor()
+        elif choice == "4":
+            update_professor()
+        elif choice == "5":
+            professor_report()
+        elif choice == "6":
+            break
+        else:
+            print("Invalid choice.")
+
 
 
 #Submenu for course
@@ -347,6 +504,7 @@ def course_menu():
         else:
             print("Invalid choice.")
 
+#MAIN
 
 def main():
     while True:
@@ -360,7 +518,8 @@ def main():
         print("7. Course Statistics")
         print("8. Course Grade Report")
         print("9. Course Management")
-        print("10. Exit")
+        print("10. Professor Management")
+        print("11. Exit")
         
 
         choice = input("Enter choice: ")
@@ -384,6 +543,8 @@ def main():
         elif choice == "9":
             course_menu()
         elif choice == "10":
+            professor_menu()
+        elif choice == "11":
             break
         else:
             print("Invalid choice.")
